@@ -1,32 +1,37 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import "./App.css";
+import { useEffect, useState } from "react";
+import Button from "./components/Button";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [mdLink, setMdLink] = useState("");
+
+  useEffect(() => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
+      if (tab[0]) {
+        const { title, url } = tab[0];
+        setMdLink(`[${title}](${url})`);
+      }
+    });
+  }, []);
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(mdLink);
+  };
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="w-72 h-52 p-2">
+      <div className="flex flex-col h-full gap-2">
+        <h1 className="text-lg font-black">Copy the link</h1>
+        <textarea
+          name=""
+          id=""
+          value={mdLink}
+          readOnly
+          className="border-2 p-2 border-black rounded-md w-full grow flex-wrap"
+        ></textarea>
+        <div className="flex justify-end">
+          <Button btnLabel="Copy" onClick={copyLink} />
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </div>
   );
 }
